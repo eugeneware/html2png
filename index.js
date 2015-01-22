@@ -15,7 +15,7 @@ function Html2Png(opts) {
   opts.browser = opts.browser || 'phantomjs';
   opts.width = opts.width || 640;
   opts.height = opts.height || 480;
-  opts.chromeHeight = opts.chromeHeight || 108;
+  opts.chromeHeight = opts.chromeHeight || 72;
   opts.scriptTimeout = opts.scriptTimeout || 30*1000;
 
   this.opts = opts;
