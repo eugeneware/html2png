@@ -15,14 +15,16 @@ function Html2Png(opts) {
   opts.width = opts.width || 640;
   opts.height = opts.height || 480;
   opts.chromeHeight = opts.chromeHeight || 108;
+  opts.scriptTimeout = opts.scriptTimeout || 30*1000;
 
   this.opts = opts;
 
-  this.driver = new webdriver.Builder()
+  var driver = this.driver = new webdriver.Builder()
   .withCapabilities({
      browserName: opts.browser
   })
   .build();
+  driver.manage().timeouts().setScriptTimeout(opts.scriptTimeout);
 
   this.resized = false;
 }
