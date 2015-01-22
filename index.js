@@ -41,11 +41,16 @@ Html2Png.prototype.render = function (html, cb) {
   var self = this, driver = this.driver, opts = this.opts;
   this._resize();
 
-  driver.executeScript(function (html) {
-      var doc = document.open('text/html');
-      doc.write(html);
-      doc.close();
-    }, html);
+  driver.executeAsyncScript(function(html, cb) {
+    document.open('text/html');
+    document.onreadystatechange = function () {
+      if (document.readyState === 'complete') {
+        cb();
+      }
+    };
+    document.write(html);
+    document.close();
+  }, html);
 
   driver.takeScreenshot().then(function (data) {
     cb(null, new Buffer(data, 'base64'));
