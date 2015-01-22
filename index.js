@@ -1,5 +1,6 @@
 var phantomjs = require('phantomjs-bin'),
-    webdriver = require('selenium-webdriver');
+    webdriver = require('selenium-webdriver'),
+    path = require('path');
 
 module.exports = Html2Png;
 
@@ -25,6 +26,7 @@ function Html2Png(opts) {
   })
   .build();
   driver.manage().timeouts().setScriptTimeout(opts.scriptTimeout);
+  driver.get('file:' + path.join(__dirname, 'empty.html'));
 
   this.resized = false;
 }
@@ -43,16 +45,19 @@ Html2Png.prototype.render = function (html, cb) {
   var self = this, driver = this.driver, opts = this.opts;
   this._resize();
 
-  driver.executeAsyncScript(function(html, cb) {
+  driver.executeAsyncScript(function(html, opts, cb) {
     document.open('text/html');
     document.onreadystatechange = function () {
       if (document.readyState === 'complete') {
-        cb();
+        if (opts.browser === 'chrome') {
+          // HACK: Images still not loaded
+          setTimeout(cb, 1000);
+        } else cb();
       }
     };
     document.write(html);
     document.close();
-  }, html);
+  }, html, opts);
 
   driver.takeScreenshot().then(function (data) {
     cb(null, new Buffer(data, 'base64'));
@@ -83,3 +88,4 @@ Html2Png.prototype.error = function (err, cb) {
     cb(err);
   });
 };
+
